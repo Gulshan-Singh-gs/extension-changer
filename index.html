@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModuCore | One UniBoard. Infinite Possibilities.</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        neon: {
+                            green: '#00ff9d',
+                            blue: '#00d4ff',
+                            dark: '#0a0a0a',
+                            gray: '#171717'
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+    <style>
+        :root {
+            --neon-green: #00ff9d;
+            --neon-blue: #00d4ff;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-blue);
+        }
+
+        /* Glow Utilities */
+        .glow-text-green {
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.5), 0 0 40px rgba(0, 255, 157, 0.2);
+        }
+
+        .glow-text-blue {
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .glow-border-green {
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.1), inset 0 0 10px rgba(0, 255, 157, 0.1);
+        }
+
+        .glow-border-blue {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1), inset 0 0 10px rgba(0, 212, 255, 0.1);
+        }
+
+        /* Button Hover Effects */
+        .btn-neon-green {
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-neon-green::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--neon-green);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-neon-green:hover::before {
+            opacity: 0.15;
+        }
+
+        .btn-neon-green:hover {
+            box-shadow: 0 0 25px rgba(0, 255, 157, 0.4);
+            text-shadow: 0 0 8px rgba(0, 255, 157, 0.8);
+        }
+
+        .btn-neon-blue {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-neon-blue::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--neon-blue);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-neon-blue:hover::before {
+            opacity: 0.15;
+        }
+
+        .btn-neon-blue:hover {
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+        }
+
+        /* Nav Blur */
+        .nav-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Canvas Containers */
+        #hero-canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        #assembly-canvas-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .card-hover {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+
+        .hat-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+        }
+
+        .hat-card.white::before {
+            background: #ffffff;
+        }
+
+        .hat-card.red::before {
+            background: #ff4757;
+        }
+
+        .hat-card.black::before {
+            background: #2f3542;
+        }
+
+        .hat-card.yellow::before {
+            background: #eccc68;
+        }
+
+        .hat-card.green::before {
+            background: #2ed573;
+            box-shadow: 0 0 15px rgba(46, 213, 115, 0.8);
+        }
+
+        .hat-card.blue::before {
+            background: #1e90ff;
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 nav-blur bg-black/60 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 cursor-pointer">
+                    <span class="font-display font-bold text-2xl tracking-tighter text-white">MODU<span
+                            class="text-neon-blue">CORE</span></span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-8">
+                        <a href="#how-it-works"
+                            class="text-gray-300 hover:text-white hover:text-neon-green transition-colors text-sm font-medium tracking-wide">How
+                            It Works</a>
+                        <a href="#six-hats"
+                            class="text-gray-300 hover:text-white hover:text-neon-blue transition-colors text-sm font-medium tracking-wide">Six
+                            Hats Strategy</a>
+                        <a href="#investor-pitch"
+                            class="text-gray-300 hover:text-white hover:text-neon-green transition-colors text-sm font-medium tracking-wide">Investor
+                            Pitch</a>
+                        <a href="#demo"
+                            class="btn-neon-blue px-5 py-2 rounded-full text-sm font-bold tracking-wider uppercase backdrop-blur-sm">Interactive
+                            Demo</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden">
+        <div id="hero-canvas-container"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black z-0 pointer-events-none">
+        </div>
+
+        <div class="relative z-10 text-center px-4 max-w-5xl mx-auto mt-16">
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-neon-blue border-opacity-30 bg-neon-blue bg-opacity-10 mb-6 backdrop-blur-md animate-float">
+                <span class="w-2 h-2 rounded-full bg-neon-blue animate-pulse"></span>
+                <span class="text-xs font-semibold text-neon-blue tracking-widest uppercase">The Next Evolution of
+                    Mobile</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-display font-bold text-white leading-tight mb-4 tracking-tight">
+                One UniBoard.<br />
+                <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-neon-green glow-text-blue">Infinite
+                    Possibilities.</span>
+            </h1>
+
+            <p class="mt-6 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light">
+                The world’s first truly customizable smartphone built around a single indestructible motherboard.
+                Magnetic daily snaps. USB-extension versatility. Build it your way.
+            </p>
+
+            <div class="mt-10 flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="#demo"
+                    class="btn-neon-blue px-8 py-4 rounded-lg font-display font-bold text-lg tracking-wide shadow-[0_0_20px_rgba(0,212,255,0.2)]">
+                    Explore the 3D UniBoard
+                </a>
+                <a href="#six-hats"
+                    class="btn-neon-green px-8 py-4 rounded-lg font-display font-bold text-lg tracking-wide shadow-[0_0_20px_rgba(0,255,157,0.2)]">
+                    Six Hats Launch Strategy
+                </a>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
+            <a href="#how-it-works" class="text-gray-500 hover:text-neon-blue transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- How It Works (Interactive Demo) -->
+    <section id="demo" class="py-24 bg-black relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-display font-bold mb-4">Hybrid <span
+                        class="text-neon-green glow-text-green">Modularity</span> in Action</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Build your ModuCore setup in real-time. Drag components onto
+                    the central UniBoard. Watch the magnetic snaps engage instantly.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+                <!-- 3D Assembly Canvas -->
+                <div class="lg:col-span-8 relative">
+                    <div id="assembly-canvas-container" class="glow-border-blue relative cursor-move"></div>
+                    <div id="assembly-status"
+                        class="absolute top-4 left-4 bg-black/60 backdrop-blur-md border border-gray-700 rounded p-4 pointer-events-none">
+                        <div class="font-display text-xs text-uppercase tracking-widest text-gray-400 mb-1">SYSTEM
+                            STATUS</div>
+                        <div class="font-mono text-neon-blue text-sm flex flex-col gap-1">
+                            <span id="status-battery">[ ] Battery Module</span>
+                            <span id="status-camera">[ ] Camera Array</span>
+                            <span id="status-compute">[ ] Compute Card (SoC)</span>
+                        </div>
+                        <div class="mt-3 font-bold text-xs tracking-wider text-green-400 animate-pulse hidden"
+                            id="status-success">ALL SYSTEMS ONLINE</div>
+                    </div>
+                    <button id="reset-assembly"
+                        class="absolute bottom-4 right-4 bg-gray-800 hover:bg-gray-700 text-xs font-bold py-2 px-4 rounded border border-gray-600 transition-colors uppercase tracking-wider backdrop-blur-md">
+                        Reset Board
+                    </button>
+                    <!-- Loading overlay for canvas -->
+                    <div id="assembly-loader"
+                        class="absolute inset-0 bg-black flex items-center justify-center z-10 transition-opacity duration-500">
+                        <div class="flex flex-col items-center">
+                            <div
+                                class="w-8 h-8 border-2 border-neon-blue border-t-transparent rounded-full animate-spin mb-4">
+                            </div>
+                            <span class="font-mono text-xs text-neon-blue tracking-widest">INITIALIZING
+                                UNIBOARD...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step Cards -->
+                <div class="lg:col-span-4 flex flex-col gap-6">
+                    <div class="p-6 rounded-xl border border-gray-800 bg-neon-dark card-hover">
+                        <div
+                            class="w-10 h-10 rounded bg-neon-blue/10 flex items-center justify-center border border-neon-blue/30 mb-4 text-neon-blue font-display font-bold">
+                            1</div>
+                        <h3 class="text-xl font-display font-bold mb-2">The UniBoard Core</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">The indestructible skeleton. It handles power
+                            delivery, data routing, and structural integrity. Nothing becomes obsolete because the core
+                            acts strictly as a highway.</p>
+                    </div>
+
+                    <div class="p-6 rounded-xl border border-gray-800 bg-neon-dark card-hover">
+                        <div
+                            class="w-10 h-10 rounded bg-neon-green/10 flex items-center justify-center border border-neon-green/30 mb-4 text-neon-green font-display font-bold">
+                            2</div>
+                        <h3 class="text-xl font-display font-bold mb-2">Magnetic Snaps</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">For screens, batteries, and rear cameras. Using
+                            proprietary magnetic pogo-pin arrays, modules snap securely in place for daily rigidity but
+                            easily detach for rapid repair or upgrades.</p>
+                    </div>
+
+                    <div class="p-6 rounded-xl border border-gray-800 bg-neon-dark card-hover">
+                        <div
+                            class="w-10 h-10 rounded bg-purple-500/10 flex items-center justify-center border border-purple-500/30 mb-4 text-purple-400 font-display font-bold">
+                            3</div>
+                        <h3 class="text-xl font-display font-bold mb-2">USB-Extension Dock</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed">Bottom port module for hot-pluggable expansion:
+                            auxiliary batteries, desktop-mode I/O docks, external GPUs, or massive storage arrays.
+                            Versatility without compromising the phone's sleek form factor.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Six Thinking Hats Strategy Section -->
+    <section id="six-hats" class="py-24 relative border-t border-gray-900 bg-[#050505]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-700 bg-gray-800 mb-6">
+                    <span class="text-xs font-semibold text-gray-300 tracking-widest uppercase">Go-to-Market
+                        Execution</span>
+                </div>
+                <h2 class="text-3xl md:text-5xl font-display font-bold mb-4">Six Thinking Hats <span
+                        class="text-white">Product Launch Strategy</span></h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">A comprehensive multi-perspective analysis to ensure ModuCore
+                    disrupts the conventional smartphone industry upon release.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- White Hat -->
+                <div class="hat-card white p-8 rounded-xl pb-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-xl font-display font-bold text-white">White Hat</h3>
+                        <span class="text-xs text-gray-500 uppercase tracking-wider font-bold ml-auto">Facts &
+                            Info</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-3 font-light">
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Define specific parameters
+                            of the launch: exact release date, target retail price, and initial shipment inventory
+                            (e.g., 50k Core units).</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Detail the exact hardware
+                            specs: UniBoard dimensions, SoC benchmarks, magnetic latch tension ratings.</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Map out distribution
+                            channels (Direct-to-Consumer via website, select premium carrier partnerships).</li>
+                    </ul>
+                </div>
+
+                <!-- Red Hat -->
+                <div class="hat-card red p-8 rounded-xl pb-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="w-6 h-6 text-[#ff4757]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                            </path>
+                        </svg>
+                        <h3 class="text-xl font-display font-bold text-[#ff4757]">Red Hat</h3>
+                        <span class="text-xs text-gray-500 uppercase tracking-wider font-bold ml-auto">Emotions</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-3 font-light">
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Cultivate a feeling of
+                            empowerment—"You finally own your hardware."</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Address aesthetic desire:
+                            The 3D neon-cyberpunk vibe makes the repairable phone desirable, not just practical.</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Gauge early impressions: The
+                            satisfying physical 'CLICK' of the magnetic snaps creates an addictive tactile emotional
+                            response.</li>
+                    </ul>
+                </div>
+
+                <!-- Black Hat -->
+                <div class="hat-card black p-8 rounded-xl pb-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="w-6 h-6 text-[#747d8c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                        <h3 class="text-xl font-display font-bold text-gray-200">Black Hat</h3>
+                        <span class="text-xs text-gray-500 uppercase tracking-wider font-bold ml-auto">Caution &
+                            Risk</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-3 font-light">
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Durability concerns: Will
+                            dust/water ruin exposed pins? (Mitigation: IP68 rated gaskets on magnetic seals).</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Software ecosystem risks:
+                            Can Android handle hot-swapping camera modules without crashing?</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Supply chain bottlenecks:
+                            Dependency on third-party SoC vendors making compatible Compute Cards.</li>
+                    </ul>
+                </div>
+
+                <!-- Yellow Hat -->
+                <div class="hat-card yellow p-8 rounded-xl pb-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="w-6 h-6 text-[#eccc68]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        <h3 class="text-xl font-display font-bold text-[#eccc68]">Yellow Hat</h3>
+                        <span class="text-xs text-gray-500 uppercase tracking-wider font-bold ml-auto">Optimism /
+                            Value</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-3 font-light">
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Long-term ROI: Highlighting
+                            the 5-7 year lifespan of the UniBoard reduces perceived high entry cost.</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Environmental win: Massive
+                            reduction in e-waste by only replacing broken screens or outdated SoCs.</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> The "Future-Proof"
+                            guarantee: Users buy once, upgrade infinitely. Highest consumer value proposition in the
+                            market.</li>
+                    </ul>
+                </div>
+
+                <!-- Green Hat -->
+                <div class="hat-card green p-8 rounded-xl pb-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="w-6 h-6 text-[#2ed573]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <h3 class="text-xl font-display font-bold text-[#2ed573]">Green Hat</h3>
+                        <span class="text-xs text-gray-500 uppercase tracking-wider font-bold ml-auto">Creativity /
+                            Ideas</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-3 font-light">
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Developer kits: Launch an
+                            open-source schematic for the USB-Extension Dock to let modders build custom accessories
+                            (e.g., thermal cameras, macro rigs).</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> "Aesthetics as a Module":
+                            Sell transparent, retro-gaming, or carbon fiber outer shells that snap magnetically.</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Gamified launch event:
+                            "Assemble your own phone" live interactive digital experiences (like this very website).
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Blue Hat -->
+                <div class="hat-card blue p-8 rounded-xl pb-10">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="w-6 h-6 text-[#1e90ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                            </path>
+                        </svg>
+                        <h3 class="text-xl font-display font-bold text-[#1e90ff]">Blue Hat</h3>
+                        <span class="text-xs text-gray-500 uppercase tracking-wider font-bold ml-auto">Process
+                            Control</span>
+                    </div>
+                    <ul class="text-sm text-gray-300 space-y-3 font-light">
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Launch sequence: Teaser
+                            Phase (CGI renders) -> Influencer Phase (Hands-on assembly videos) -> Pre-Order Phase
+                            (Configurator live).</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Synthesize feedback: Use
+                            Black Hat concerns to write the primary FAQ page structure.</li>
+                        <li class="flex items-start"><span class="mr-2 opacity-50">•</span> Success Metrics tracking:
+                            Monitor modular component attachment rates vs core system purchases post-launch.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits & Investor Pitch Section -->
+    <section id="investor-pitch" class="py-24 bg-black relative border-t border-gray-900 border-b">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-display font-bold mb-4">Why ModuCore <span
+                        class="text-neon-blue glow-text-blue">Wins 2026</span></h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">The industry pivot towards sustainability meets extreme
+                    high-end performance. We are outperforming the monolithic glass slabs of yesterday.</p>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-gray-800 shadow-2xl">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-900/50 border-b border-gray-800">
+                            <th class="py-5 px-6 font-display font-bold text-white w-1/4">Feature Pillar</th>
+                            <th class="py-5 px-6 font-display font-bold text-gray-300 w-1/3">User Win</th>
+                            <th class="py-5 px-6 font-display font-bold text-neon-blue w-5/12">2026 Competitive Edge vs
+                                Big Tech</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800/50 text-sm md:text-base">
+                        <tr class="hover:bg-gray-900/30 transition-colors">
+                            <td class="py-5 px-6 text-white font-medium">10/10 Repairability</td>
+                            <td class="py-5 px-6 text-gray-400">Replace a cracked screen at home in 30 seconds with zero
+                                tools using magnetic snaps.</td>
+                            <td class="py-5 px-6 text-gray-300">Bypasses right-to-repair legislation hurdles completely;
+                                zero proprietary glue logic. Cuts reliance on authorized repair centers.</td>
+                        </tr>
+                        <tr class="hover:bg-gray-900/30 transition-colors">
+                            <td class="py-5 px-6 text-white font-medium">Swappable Compute</td>
+                            <td class="py-5 px-6 text-gray-400">Upgrade to next year's CPU/RAM block without paying for
+                                a brand new screen and chassis.</td>
+                            <td class="py-5 px-6 text-gray-300">Defeats forced obsolescence. Turns hardware into a
+                                Subscription-compatible service (Hardware-as-a-Service model viable).</td>
+                        </tr>
+                        <tr class="hover:bg-gray-900/30 transition-colors">
+                            <td class="py-5 px-6 text-white font-medium">USB-Ext. Ecosystem</td>
+                            <td class="py-5 px-6 text-gray-400">Plug in a DSLR-grade lens array or a 10,000mAh battery
+                                pack when needed; remove it when not.</td>
+                            <td class="py-5 px-6 text-gray-300">Eliminates the "thick vs thin" compromise. Competitors
+                                must choose one; ModuCore adapts dynamically.</td>
+                        </tr>
+                        <tr class="hover:bg-gray-900/30 transition-colors">
+                            <td class="py-5 px-6 text-white font-medium">Single UniBoard</td>
+                            <td class="py-5 px-6 text-gray-400">Flawless latency and monolithic-level performance unlike
+                                ribbon-cable intensive modular phones of the past.</td>
+                            <td class="py-5 px-6 text-gray-300">Solves the primary failure point of Project Ara.
+                                Extremely high manufacturing yield. High margin hardware base.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-16 text-center">
+                <a href="#"
+                    class="inline-flex items-center gap-2 btn-neon-blue px-10 py-5 rounded-lg font-display font-bold text-lg tracking-wide shadow-[0_0_20px_rgba(0,212,255,0.2)] group">
+                    <svg class="w-6 h-6 group-hover:animate-bounce" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download Full Pitch Deck
+                </a>
+                <p class="mt-4 text-xs text-gray-600 font-mono">PDF • 12MB • CONFIDENTIAL</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#050505] pt-20 pb-10 border-t border-gray-900">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <h2 class="text-4xl md:text-6xl font-display font-black text-white mb-6 uppercase tracking-tighter">The
+                Future IS <span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-neon-green to-neon-blue glow-text-green">Modular</span>
+            </h2>
+            <p class="text-gray-500 mb-10 max-w-xl mx-auto font-light">Join the hardware revolution. Pre-seed round
+                opening Q3 2026. For detailed financials and prototype demos, contact our partner team.</p>
+
+            <div class="flex flex-wrap justify-center gap-4 mb-16">
+                <a href="#" class="btn-neon-green px-8 py-3 rounded text-sm font-bold tracking-wider uppercase">Contact
+                    Partners</a>
+                <a href="https://x.com/_GuLsHan0SiNgh_"
+                    class="bg-white text-black hover:bg-gray-200 transition-colors px-8 py-3 rounded text-sm font-bold tracking-wider uppercase flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
+                    </svg>
+                    Connect on X
+                </a>
+            </div>
+
+            <div
+                class="border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 font-mono">
+                <p>&copy; 2026 ModuCore Inc. All rights reserved.</p>
+                <p class="mt-2 md:mt-0">Designed with Three.js | High-Performance WebGL</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Three.js Implementation -->
+    <script>
+        console.log("%c MODUCORE INITIATED ", "background: #00ff9d; color: #000; font-weight: bold; font-size: 14px;");
+
+        // --- Common Materials ---
+        const matBase = new THREE.MeshPhysicalMaterial({
+            color: 0x111111, metalness: 0.8, roughness: 0.2, clearcoat: 0.5
+        });
+        const matCopper = new THREE.MeshPhysicalMaterial({
+            color: 0xd4af37, metalness: 1.0, roughness: 0.1
+        });
+        const matNeonGreen = new THREE.MeshStandardMaterial({
+            color: 0x00ff9d, emissive: 0x00ff9d, emissiveIntensity: 0.5
+        });
+        const matNeonBlue = new THREE.MeshStandardMaterial({
+            color: 0x00d4ff, emissive: 0x00d4ff, emissiveIntensity: 0.5
+        });
+
+        // --- Model Builders ---
+        function createUniBoardCore() {
+            const group = new THREE.Group();
+            const geom = new THREE.BoxGeometry(4, 8, 0.2);
+            const mesh = new THREE.Mesh(geom, matBase);
+            group.add(mesh);
+
+            // Add some circuitry lines
+            const gridGeom = new THREE.BoxGeometry(3.5, 7.5, 0.22);
+            const gridMat = new THREE.MeshBasicMaterial({ color: 0x222222, wireframe: true });
+            const grid = new THREE.Mesh(gridGeom, gridMat);
+            group.add(grid);
+
+            // CPU Socket Area (Empty)
+            const socketGeom = new THREE.BoxGeometry(1.5, 1.5, 0.25);
+            const socket = new THREE.Mesh(socketGeom, new THREE.MeshStandardMaterial({ color: 0x0a0a0a }));
+            socket.position.set(0, 1.5, 0);
+            group.add(socket);
+
+            return group;
+        }
+
+        function createBattery() {
+            const group = new THREE.Group();
+            const geom = new THREE.BoxGeometry(2.5, 3.5, 0.4);
+            const mesh = new THREE.Mesh(geom, new THREE.MeshPhysicalMaterial({ color: 0x2d3436, roughness: 0.6 }));
+            group.add(mesh);
+
+            // Battery indicator
+            const indGeom = new THREE.BoxGeometry(0.1, 1, 0.42);
+            const ind = new THREE.Mesh(indGeom, matNeonGreen);
+            ind.position.set(-1, 0, 0);
+            group.add(ind);
+
+            group.userData = { type: 'battery', id: 'module-battery' };
+            return group;
+        }
+
+        function createCamera() {
+            const group = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 0.5), matBase);
+            group.add(body);
+
+            const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.6, 32), new THREE.MeshPhysicalMaterial({ color: 0x000000, metalness: 0.9, roughness: 0.1, clearcoat: 1 }));
+            lens.rotation.x = Math.PI / 2;
+            group.add(lens);
+
+            // Accent light
+            const ring = new THREE.Mesh(new THREE.RingGeometry(0.55, 0.6, 32), new THREE.MeshBasicMaterial({ color: 0x00d4ff }));
+            ring.position.z = 0.26;
+            group.add(ring);
+
+            group.userData = { type: 'camera', id: 'module-camera' };
+            return group;
+        }
+
+        function createComputeCard() {
+            const group = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.4, 0.3), matCopper);
+            group.add(body);
+
+            const chip = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.35), matBase);
+            group.add(chip);
+
+            group.userData = { type: 'compute', id: 'module-compute' };
+            return group;
+        }
+
+        // ==========================================
+        // SCENE 1: HERO (Floating/Orbiting Animation)
+        // ==========================================
+        const initHeroScene = () => {
+            const container = document.getElementById('hero-canvas-container');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.05);
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 15;
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const pointLight1 = new THREE.PointLight(0x00ff9d, 2, 50);
+            pointLight1.position.set(5, 5, 5);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0x00d4ff, 2, 50);
+            pointLight2.position.set(-5, -5, 5);
+            scene.add(pointLight2);
+
+            // Objects
+            const centralBoardGroup = new THREE.Group();
+            const uniboard = createUniBoardCore();
+            centralBoardGroup.add(uniboard);
+            scene.add(centralBoardGroup);
+
+            // Floating elements
+            const floaters = [];
+
+            const compute = createComputeCard();
+            compute.position.set(3, 2, 1);
+            scene.add(compute);
+            floaters.push({ obj: compute, speed: 0.01, radius: 4, angle: 0 });
+
+            const cam = createCamera();
+            cam.position.set(-4, 0, -2);
+            scene.add(cam);
+            floaters.push({ obj: cam, speed: 0.008, radius: 5, angle: Math.PI });
+
+            const bat = createBattery();
+            bat.position.set(2, -3, 2);
+            scene.add(bat);
+            floaters.push({ obj: bat, speed: 0.012, radius: 4.5, angle: Math.PI / 2 });
+
+            // Particles
+            const pGeom = new THREE.BufferGeometry();
+            const pCount = 200;
+            const pPos = new Float32Array(pCount * 3);
+            for (let i = 0; i < pCount * 3; i++) pPos[i] = (Math.random() - 0.5) * 20;
+            pGeom.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            const pMat = new THREE.PointsMaterial({ color: 0x00d4ff, size: 0.05, transparent: true, opacity: 0.5 });
+            const particles = new THREE.Points(pGeom, pMat);
+            scene.add(particles);
+
+            // Animation
+            const clock = new THREE.Clock();
+            let mouseX = 0;
+            let mouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                const t = clock.getElapsedTime();
+
+                // Rotate central board slowly
+                centralBoardGroup.rotation.y = Math.sin(t * 0.5) * 0.3 + (mouseX * 0.5);
+                centralBoardGroup.rotation.x = Math.cos(t * 0.3) * 0.2 + (-mouseY * 0.5);
+
+                // Orbit floaters
+                floaters.forEach(f => {
+                    f.angle += f.speed;
+                    f.obj.position.x = Math.cos(f.angle) * f.radius;
+                    f.obj.position.z = Math.sin(f.angle) * f.radius;
+                    f.obj.position.y += Math.sin(t * 2 + f.angle) * 0.02;
+                    f.obj.rotation.x += 0.01;
+                    f.obj.rotation.y += 0.01;
+                });
+
+                particles.rotation.y = t * 0.05;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Resize handle
+            window.addEventListener('resize', () => {
+                // Only resize width/height based on container for hero
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // ==========================================
+        // SCENE 2: ASSEMBLY (Interactive Snapping)
+        // ==========================================
+        const initAssemblyScene = () => {
+            const container = document.getElementById('assembly-canvas-container');
+            const scene = new THREE.Scene();
+
+            // Add grid helper to look cool
+            const gridHelper = new THREE.GridHelper(20, 20, 0x00d4ff, 0x222222);
+            gridHelper.position.y = -2;
+            gridHelper.rotation.x = Math.PI / 4;
+            gridHelper.material.opacity = 0.2;
+            gridHelper.material.transparent = true;
+            scene.add(gridHelper);
+
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+            camera.position.set(0, 0, 15);
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(w, h);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Lights
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const dLight = new THREE.DirectionalLight(0xffffff, 1);
+            dLight.position.set(5, 5, 5);
+            scene.add(dLight);
+
+            // The Board (Static target)
+            const mainBoard = createUniBoardCore();
+            mainBoard.position.set(3, 0, 0); // Put on the right
+            scene.add(mainBoard);
+
+            // Snap Targets relative to mainBoard position
+            const targets = {
+                battery: { pos: new THREE.Vector3(3, -1.8, 0.3), radius: 1.5 },
+                camera: { pos: new THREE.Vector3(3, 2.5, 0.35), radius: 1.5 },
+                compute: { pos: new THREE.Vector3(3, 1.5, 0.35), radius: 1.0 },
+            };
+
+            // Interactive Modules Array
+            let modules = [];
+            const startPositions = {};
+
+            const mBat = createBattery();
+            mBat.position.set(-4, -2, 0);
+            scene.add(mBat);
+            modules.push(mBat);
+            startPositions['battery'] = new THREE.Vector3(-4, -2, 0);
+
+            const mCam = createCamera();
+            mCam.position.set(-4, 2, 0);
+            scene.add(mCam);
+            modules.push(mCam);
+            startPositions['camera'] = new THREE.Vector3(-4, 2, 0);
+
+            const mComp = createComputeCard();
+            mComp.position.set(-4, 0, 0);
+            scene.add(mComp);
+            modules.push(mComp);
+            startPositions['compute'] = new THREE.Vector3(-4, 0, 0);
+
+            // Raycaster Interaction
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            let draggedObject = null;
+            let offset = new THREE.Vector3();
+            let snapStatus = { battery: false, camera: false, compute: false };
+
+            const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+            const planeIntersect = new THREE.Vector3();
+
+            const updateStatusUI = () => {
+                if (snapStatus.battery) {
+                    document.getElementById('status-battery').textContent = '[X] Battery Module ONLINE';
+                    document.getElementById('status-battery').classList.replace('text-neon-blue', 'text-neon-green');
+                } else {
+                    document.getElementById('status-battery').textContent = '[ ] Battery Module';
+                    document.getElementById('status-battery').classList.replace('text-neon-green', 'text-neon-blue');
+                }
+
+                if (snapStatus.camera) {
+                    document.getElementById('status-camera').textContent = '[X] Camera Array SECURE';
+                    document.getElementById('status-camera').classList.replace('text-neon-blue', 'text-neon-green');
+                } else {
+                    document.getElementById('status-camera').textContent = '[ ] Camera Array';
+                    document.getElementById('status-camera').classList.replace('text-neon-green', 'text-neon-blue');
+                }
+
+                if (snapStatus.compute) {
+                    document.getElementById('status-compute').textContent = '[X] Compute Card SYNCED';
+                    document.getElementById('status-compute').classList.replace('text-neon-blue', 'text-neon-green');
+                } else {
+                    document.getElementById('status-compute').textContent = '[ ] Compute Card (SoC)';
+                    document.getElementById('status-compute').classList.replace('text-neon-green', 'text-neon-blue');
+                }
+
+                if (snapStatus.battery && snapStatus.camera && snapStatus.compute) {
+                    document.getElementById('status-success').classList.remove('hidden');
+                    container.classList.add('glow-border-green');
+                    container.classList.remove('glow-border-blue');
+                } else {
+                    document.getElementById('status-success').classList.add('hidden');
+                    container.classList.remove('glow-border-green');
+                    container.classList.add('glow-border-blue');
+                }
+            };
+
+            container.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                const rect = container.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+
+                // Get objects, filter out grids/lights via name/type if needed
+                // We will just intersect our specific groups
+                const childrenToIntersect = modules.map(m => m.children[0]);
+                const intersects = raycaster.intersectObjects(childrenToIntersect);
+
+                if (intersects.length > 0) {
+                    draggedObject = intersects[0].object.parent; // get the Group
+
+                    // Prevent dragging if already snapped
+                    const type = draggedObject.userData.type;
+                    if (snapStatus[type]) {
+                        draggedObject = null;
+                        return;
+                    }
+
+                    container.style.cursor = 'grabbing';
+
+                    raycaster.ray.intersectPlane(plane, planeIntersect);
+                    offset.copy(planeIntersect).sub(draggedObject.position);
+                }
+            });
+
+            container.addEventListener('pointermove', (e) => {
+                e.preventDefault();
+                if (!draggedObject) return;
+
+                const rect = container.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
+
+                raycaster.setFromCamera(mouse, camera);
+                raycaster.ray.intersectPlane(plane, planeIntersect);
+
+                draggedObject.position.copy(planeIntersect.sub(offset));
+
+                // Check distance to target
+                const type = draggedObject.userData.type;
+                const target = targets[type];
+                const dist = draggedObject.position.distanceTo(target.pos);
+
+                // Visual hint
+                if (dist < target.radius * 1.5) {
+                    draggedObject.scale.set(1.05, 1.05, 1.05);
+                } else {
+                    draggedObject.scale.set(1, 1, 1);
+                }
+            });
+
+            container.addEventListener('pointerup', () => {
+                container.style.cursor = 'move';
+                if (!draggedObject) return;
+
+                const type = draggedObject.userData.type;
+                const target = targets[type];
+                const dist = draggedObject.position.distanceTo(target.pos);
+
+                if (dist < target.radius) {
+                    // SNAP!
+                    draggedObject.position.copy(target.pos);
+                    draggedObject.scale.set(1, 1, 1);
+                    snapStatus[type] = true;
+
+                    // Flash effect
+                    const originalMat = draggedObject.children[0].material;
+                    draggedObject.children[0].material = matNeonGreen;
+                    setTimeout(() => {
+                        draggedObject.children[0].material = originalMat;
+                    }, 200);
+
+                    updateStatusUI();
+                }
+
+                draggedObject = null;
+            });
+
+            // Reset Button
+            document.getElementById('reset-assembly').addEventListener('click', () => {
+                modules.forEach(m => {
+                    const type = m.userData.type;
+                    m.position.copy(startPositions[type]);
+                    snapStatus[type] = false;
+                });
+                updateStatusUI();
+            });
+
+            // Animation Loop
+            const clock = new THREE.Clock();
+            const animate = () => {
+                requestAnimationFrame(animate);
+                const t = clock.getElapsedTime();
+
+                // Gentle float for unsnapped modules
+                modules.forEach(m => {
+                    if (!snapStatus[m.userData.type] && m !== draggedObject) {
+                        m.rotation.y = Math.sin(t + m.position.y) * 0.1;
+                    } else if (snapStatus[m.userData.type]) {
+                        m.rotation.set(0, 0, 0);
+                    }
+                });
+
+                // Gently rotate the whole board unit slightly for 3D feel
+                mainBoard.rotation.y = Math.sin(t * 0.5) * 0.1 - 0.1;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Handle resize specific to this container
+            window.addEventListener('resize', () => {
+                const cw = container.clientWidth;
+                const ch = container.clientHeight;
+                camera.aspect = cw / ch;
+                camera.updateProjectionMatrix();
+                renderer.setSize(cw, ch);
+            });
+
+            // Remove Loader
+            setTimeout(() => {
+                const loader = document.getElementById('assembly-loader');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }, 1000);
+        };
+
+        // Initialize on load
+        window.onload = () => {
+            initHeroScene();
+            // Start assembly scene slightly delayed to prioritize first paint
+            setTimeout(initAssemblyScene, 500);
+        };
+
+    </script>
+</body>
+
+</html>
