@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works | ModuCore - The Architecture of Modularity</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        neon: {
+                            green: '#00ff9d',
+                            blue: '#00d4ff',
+                            dark: '#0a0a0a',
+                            gray: '#171717'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --neon-green: #00ff9d;
+            --neon-blue: #00d4ff;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .glow-text-green { text-shadow: 0 0 20px rgba(0, 255, 157, 0.5); }
+        .glow-text-blue { text-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
+        
+        .nav-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .step-number {
+            font-family: 'Space Grotesk';
+            font-size: 5rem;
+            line-height: 1;
+            font-weight: 800;
+            opacity: 0.1;
+            position: absolute;
+            top: -1rem;
+            left: -1rem;
+            z-index: 0;
+            color: var(--neon-blue);
+        }
+
+        .content-card {
+            background: rgba(15, 15, 15, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .connector-line {
+            width: 2px;
+            background: linear-gradient(to bottom, var(--neon-blue), transparent);
+            height: 100%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+
+        .feature-tag {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            color: var(--neon-blue);
+            font-family: 'Space Grotesk';
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+        }
+    </style>
+</head>
+<body class="bg-black">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 nav-blur bg-black/60 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <a href="index.html" class="flex-shrink-0 cursor-pointer">
+                    <span class="font-display font-bold text-2xl tracking-tighter text-white">MODU<span class="text-neon-blue">CORE</span></span>
+                </a>
+                <div class="flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-400 hover:text-white text-sm font-medium transition-colors">← Back to Pitch</a>
+                    <a href="index.html#demo" class="hidden md:block border border-neon-blue text-neon-blue px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-neon-blue hover:text-black transition-all">Try 3D Demo</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="relative pt-40 pb-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-7xl font-display font-extrabold text-white mb-6">
+                    How it <span class="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-neon-green glow-text-blue">Works</span>
+                </h1>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed font-light">
+                    Built around a revolutionary single <span class="text-white font-medium">UniBoard</span> — the central nervous system for the world's most versatile high-performance device.
+                </p>
+            </div>
+        </div>
+        <!-- Background Decor -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-20 pointer-events-none">
+            <div class="w-[800px] h-[800px] bg-neon-blue/30 rounded-full blur-[120px] mx-auto mt-[-400px]"></div>
+        </div>
+    </header>
+
+    <!-- The 3 Pillars Section -->
+    <section class="py-20 relative px-4">
+        <div class="max-w-5xl mx-auto space-y-32">
+            
+            <!-- Pillar 1 -->
+            <div class="relative grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="relative order-2 md:order-1">
+                    <span class="step-number text-neon-blue">01</span>
+                    <h2 class="text-3xl font-display font-bold mb-6 text-white pt-8">The UniBoard – <br><span class="text-neon-blue">The Intelligent Core</span></h2>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        One thin, powerful motherboard that acts as the brain and nervous system of the device. Proprietary high-bandwidth connectors combined with magnetic alignment points.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="feature-tag">USB4 Connectivity</span>
+                        <span class="feature-tag">Thunderbolt Class</span>
+                        <span class="feature-tag">No Internal Wiring</span>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2 p-8 bg-zinc-900/40 rounded-3xl border border-white/5 content-card">
+                    <div class="aspect-square flex items-center justify-center border-2 border-dashed border-gray-800 rounded-2xl">
+                        <span class="text-neon-blue font-mono text-xs opacity-50 animate-pulse">[ 3D CORE SCHEMATIC LOADED ]</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pillar 2 -->
+            <div class="relative grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="p-8 bg-zinc-900/40 rounded-3xl border border-white/5 content-card">
+                    <div class="aspect-square flex items-center justify-center border-2 border-dashed border-gray-800 rounded-2xl">
+                        <span class="text-neon-green font-mono text-xs opacity-50 animate-pulse">[ MODULE INTERFACE ACTIVE ]</span>
+                    </div>
+                </div>
+                <div class="relative">
+                    <span class="step-number text-neon-green">02</span>
+                    <h2 class="text-3xl font-display font-bold mb-6 text-white pt-8">Magnetic Snap System – <br><span class="text-neon-green">Daily Flexibility</span></h2>
+                    <ul class="space-y-4 text-gray-400 text-sm">
+                        <li class="flex items-start gap-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-neon-green mt-1.5"></span>
+                            <span><strong>Screen Module:</strong> Swap sizes (6.1" to 6.8") or display tech (OLED to micro-LED) instantly.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-neon-green mt-1.5"></span>
+                            <span><strong>Battery Module:</strong> Snap in standard or high-capacity power in seconds.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-neon-green mt-1.5"></span>
+                            <span><strong>Compute Card:</strong> A swappable SoC block containing Processor + RAM + Storage. Upgrade performance without throwing away the phone.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Pillar 3 -->
+            <div class="relative grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="relative order-2 md:order-1">
+                    <span class="step-number text-purple-500">03</span>
+                    <h2 class="text-3xl font-display font-bold mb-6 text-white pt-8">USB-Extension Dock – <br><span class="text-purple-500">Unlimited Power</span></h2>
+                    <p class="text-gray-400 mb-6 leading-relaxed text-sm">
+                        For advanced users, attach the slim USB-Extension Dock. Hot-plug NVMe storage for media libraries, add auxiliary RAM modules, or transform the phone into a workstation by connecting a monitor.
+                    </p>
+                    <div class="p-4 bg-purple-500/5 rounded-lg border border-purple-500/20 text-xs text-purple-300 italic">
+                        "Your pocketable phone becomes a hybrid workstation on demand."
+                    </div>
+                </div>
+                <div class="order-1 md:order-2 p-8 bg-zinc-900/40 rounded-3xl border border-white/5 content-card">
+                    <div class="aspect-square flex items-center justify-center border-2 border-dashed border-gray-800 rounded-2xl">
+                        <span class="text-purple-500 font-mono text-xs opacity-50 animate-pulse">[ HYBRID PORT INITIALIZED ]</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="py-24 bg-[#050505] border-t border-gray-900">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-4xl font-display font-bold text-center mb-16 px-4">The <span class="text-neon-blue">Key Advantages</span></h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Advantage Cards -->
+                <div class="p-6 rounded-2xl bg-zinc-900/30 border border-gray-800">
+                    <div class="text-neon-blue font-display font-bold text-lg mb-2">10/10 Repairability</div>
+                    <p class="text-gray-500 text-sm">Every part is user-replaceable. No more proprietary glue logic or authorized repair lockdowns.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-zinc-900/30 border border-gray-800">
+                    <div class="text-neon-green font-display font-bold text-lg mb-2">5–7 Year Evolution</div>
+                    <p class="text-gray-500 text-sm">Buy the base once. Replace only the screen or CPU as technology evolves. Built to last.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-zinc-900/30 border border-gray-800">
+                    <div class="text-white font-display font-bold text-lg mb-2">True Modularity</div>
+                    <p class="text-gray-500 text-sm">Deeper board-level integration than simple external accessories. Total hardware freedom.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-zinc-900/30 border border-gray-800">
+                    <div class="text-neon-blue font-display font-bold text-lg mb-2">Eco-Revolution</div>
+                    <p class="text-gray-500 text-sm">Massively reduce e-waste by keeping the core system and only upgrading failing or obsolete modules.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-20 text-center border-t border-gray-900">
+        <h3 class="text-2xl font-display font-bold text-white mb-8 px-4">Ready to see it in action?</h3>
+        <a href="index.html#demo" class="px-8 py-4 bg-neon-blue text-black font-bold rounded-lg uppercase tracking-widest hover:scale-105 transition-transform inline-block">
+            Launch 3D Configurator
+        </a>
+        <p class="mt-12 text-gray-700 text-xs font-mono uppercase tracking-[0.3em]">ModuCore Architecture Protocol • 2026</p>
+    </footer>
+
+</body>
+</html>
